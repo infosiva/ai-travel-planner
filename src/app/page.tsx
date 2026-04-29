@@ -45,13 +45,13 @@ function useWeather(destination: string, enabled: boolean) {
 function WeatherBar({ weather, loading }: { weather: WeatherDay[] | null; loading: boolean }) {
   if (loading) return (
     <div className="rounded-xl border border-white/8 bg-white/[0.025] px-5 py-3 flex items-center gap-3">
-      <div className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+      <div className="w-4 h-4 border-2 border-amber-600/30 border-t-amber-500 rounded-full animate-spin" />
       <span className="text-xs text-white/40">Fetching weather...</span>
     </div>
   )
   if (!weather || weather.length === 0) return null
   return (
-    <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/[0.04] px-5 py-4">
+    <div className="rounded-xl border border-amber-700/20 bg-amber-950/20 px-5 py-4">
       <div className="text-[10px] text-white/40 uppercase tracking-wider mb-3 flex items-center gap-1.5">
         <span>🌤</span> 3-Day Weather Forecast
       </div>
@@ -166,56 +166,91 @@ export default function Home() {
     } finally { setLoading(false) }
   }
 
-  const inputCls = 'w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 focus:outline-none focus:border-indigo-500/50 transition-all'
+  const inputCls = 'w-full bg-black/40 border border-amber-900/40 rounded-lg px-4 py-3 text-sm text-amber-100 placeholder-amber-900/60 focus:outline-none focus:border-amber-600/60 transition-all'
 
   return (
-    <main className="min-h-screen bg-[#09090f] text-white">
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute -top-20 left-1/3 w-[500px] h-[500px] rounded-full bg-indigo-600/15 blur-[130px]" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[120px]" />
-        {withKids && <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-orange-500/8 blur-[100px]" />}
-      </div>
-
-      <nav className="border-b border-white/5 backdrop-blur-xl bg-white/[0.02] sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center font-bold text-sm">W</div>
-            <span className="font-semibold text-lg">WanderAI</span>
+    <main className="min-h-screen relative z-10">
+      {/* Magazine nav */}
+      <nav className="border-b border-amber-900/30 backdrop-blur-xl bg-black/40 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">✈️</div>
+            <div>
+              <span className="magazine-serif font-black text-xl text-amber-200 tracking-tight">WanderAI</span>
+              <span className="hidden sm:inline text-xs text-amber-900 ml-2">AI Travel Planner</span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {withKids && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-medium">
-                <span>🧒</span> Kids Mode
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-semibold">
+                🧒 Family Mode
               </div>
             )}
             {itinerary && (
               <button onClick={() => printItinerary(itinerary, withKids)}
-                className="px-3 py-2 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-xs font-medium text-white/60 hover:text-white transition-all flex items-center gap-1.5">
+                className="px-3 py-2 rounded border border-amber-800/40 bg-amber-950/30 hover:bg-amber-950/60 text-xs font-medium text-amber-400 hover:text-amber-300 transition-all flex items-center gap-1.5">
                 🖨️ Print / PDF
               </button>
             )}
-            <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-sm font-medium transition-all">
-              Plan free trip
+            <button className="px-4 py-2 rounded bg-amber-600 hover:bg-amber-500 text-sm font-bold transition-all text-black">
+              Plan free →
             </button>
           </div>
         </div>
+        <div className="h-px bg-gradient-to-r from-transparent via-amber-700/40 to-transparent" />
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 pt-16 pb-24">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-medium mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            AI-powered · Weather-aware · Kids-friendly · Printable
+      {/* Hero — magazine cover style */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/40 via-transparent to-transparent" />
+        <div className="max-w-6xl mx-auto px-6 pt-14 pb-10 relative">
+          <div className="flex flex-col md:flex-row items-start gap-8">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 border border-amber-700/40 bg-amber-950/40 text-amber-500 text-xs font-bold uppercase tracking-widest rounded">
+                ✦ AI-Powered · Weather-Aware · Kids-Friendly
+              </div>
+              <h1 className="magazine-serif text-5xl md:text-7xl font-black text-amber-100 leading-[0.9] tracking-tight mb-4">
+                Go<br />
+                <span className="text-amber-500">somewhere</span><br />
+                beautiful.
+              </h1>
+              <p className="text-amber-200/50 text-base max-w-md leading-relaxed">
+                Tell AI where you dream of going. Get a day-by-day itinerary with local tips, weather forecasts, and family-friendly options — in seconds.
+              </p>
+              {/* Destination stamps */}
+              <div className="flex flex-wrap gap-2 mt-5">
+                {['🗼 Paris', '🗾 Tokyo', '🏝️ Bali', '🗽 New York', '🦁 Safari', '🏔️ Alps'].map(d => (
+                  <button key={d} onClick={() => setDestination(d.split(' ').slice(1).join(' '))}
+                    className="stamp text-xs text-amber-600/80 px-3 py-1.5 rounded-lg hover:border-amber-600/60 hover:text-amber-400 transition-all bg-amber-950/20">
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Stats sidebar */}
+            <div className="hidden lg:flex flex-col gap-3 flex-shrink-0 w-44">
+              {[
+                { icon: '🌍', label: 'Destinations', value: '195+' },
+                { icon: '📅', label: 'Max days', value: '14 days' },
+                { icon: '🧒', label: 'Family mode', value: 'Built-in' },
+                { icon: '🌤', label: 'Weather', value: 'Live' },
+              ].map(s => (
+                <div key={s.label} className="day-card rounded-lg px-3 py-2.5 flex items-center gap-2.5">
+                  <span className="text-lg">{s.icon}</span>
+                  <div>
+                    <div className="text-[9px] text-amber-900 uppercase tracking-widest">{s.label}</div>
+                    <div className="text-sm text-amber-300 font-bold">{s.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-            Your perfect trip,<br />
-            <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">planned in seconds</span>
-          </h1>
-          <p className="text-white/50 text-lg">Tell us where you&apos;re going and who you&apos;re travelling with. AI builds a detailed day-by-day itinerary tailored just for you.</p>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-6 pb-24">
         {/* Config form */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 mb-10" style={{ boxShadow: withKids ? '0 0 40px rgba(249,115,22,0.1)' : '0 0 40px rgba(99,102,241,0.1)' }}>
+        <div className="day-card rounded-xl p-8 mb-8 amber-glow" style={{ boxShadow: withKids ? '0 0 40px rgba(249,115,22,0.12)' : '0 0 40px rgba(217,119,6,0.12)' }}>
           {/* Row 1: Destination + Duration */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
             <div className="md:col-span-2">
@@ -223,8 +258,8 @@ export default function Home() {
               <input value={destination} onChange={e => setDestination(e.target.value)} onKeyDown={e => e.key === 'Enter' && generate()} placeholder="Paris, Tokyo, Bali, New York, Queenstown..." className={inputCls} />
             </div>
             <div>
-              <label className="text-xs text-white/40 uppercase tracking-wider mb-2 block">Duration — <span className="text-indigo-300 font-semibold">{duration} {duration === 1 ? 'day' : 'days'}</span></label>
-              <input type="range" min={1} max={14} value={duration} onChange={e => setDuration(Number(e.target.value))} className="w-full mt-3 accent-indigo-500" />
+              <label className="text-xs text-white/40 uppercase tracking-wider mb-2 block">Duration — <span className="text-amber-400 font-semibold">{duration} {duration === 1 ? 'day' : 'days'}</span></label>
+              <input type="range" min={1} max={14} value={duration} onChange={e => setDuration(Number(e.target.value))} className="w-full mt-3 accent-amber-500" />
               <div className="flex justify-between text-[10px] text-white/20 mt-1">
                 <span>1 day</span><span>1 week</span><span>2 weeks</span>
               </div>
@@ -238,7 +273,7 @@ export default function Home() {
               {TRAVEL_WITH.map(tw => (
                 <button key={tw} onClick={() => setTravelWith(tw)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${travelWith === tw
-                    ? tw === 'Family with Kids' ? 'bg-orange-500/25 border border-orange-500/50 text-orange-300' : 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-300'
+                    ? tw === 'Family with Kids' ? 'bg-orange-500/25 border border-orange-500/50 text-orange-300' : 'bg-amber-600/15 border border-amber-600/40 text-amber-300'
                     : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>
                   {tw === 'Family with Kids' ? '🧒 ' : tw === 'Couple' ? '💑 ' : tw === 'Solo' ? '🎒 ' : tw === 'Friends Group' ? '👥 ' : '👴 '}{tw}
                 </button>
@@ -257,7 +292,7 @@ export default function Home() {
               <label className="text-xs text-white/40 uppercase tracking-wider mb-2 block">Budget</label>
               <div className="flex gap-1.5">
                 {BUDGETS.map(b => (
-                  <button key={b} onClick={() => setBudget(b)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${budget === b ? 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{b}</button>
+                  <button key={b} onClick={() => setBudget(b)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${budget === b ? 'bg-amber-600/15 border border-amber-600/40 text-amber-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{b}</button>
                 ))}
               </div>
             </div>
@@ -265,7 +300,7 @@ export default function Home() {
               <label className="text-xs text-white/40 uppercase tracking-wider mb-2 block">Travel style</label>
               <div className="flex gap-1.5">
                 {STYLES.map(s => (
-                  <button key={s} onClick={() => setStyle(s)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${style === s ? 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{s}</button>
+                  <button key={s} onClick={() => setStyle(s)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${style === s ? 'bg-amber-600/15 border border-amber-600/40 text-amber-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{s}</button>
                 ))}
               </div>
             </div>
@@ -282,7 +317,7 @@ export default function Home() {
           </div>
 
           <button onClick={generate} disabled={!destination || loading}
-            className={`w-full py-4 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 ${withKids ? 'bg-gradient-to-r from-orange-500 to-indigo-600 hover:from-orange-400 hover:to-indigo-500' : 'bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500'}`}>
+            className={`w-full py-4 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 ${withKids ? 'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500'}`}>
             {loading
               ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Crafting your itinerary...</>
               : withKids ? '🧒 Generate family-friendly itinerary ✦' : 'Generate itinerary ✦'
@@ -323,7 +358,7 @@ export default function Home() {
               <div className="flex gap-2 items-start flex-shrink-0">
                 <div className="px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm">
                   <span className="text-white/40">Est. budget: </span>
-                  <span className="text-indigo-300 font-semibold">{itinerary.budget_estimate}</span>
+                  <span className="text-amber-400 font-semibold">{itinerary.budget_estimate}</span>
                 </div>
               </div>
             </div>
@@ -349,7 +384,7 @@ export default function Home() {
               <div key={day.day} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
                 <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-black flex-shrink-0">{day.day}</div>
+                    <div className="w-10 h-10 rounded-xl bg-amber-700/20 text-amber-400 flex items-center justify-center font-black flex-shrink-0">{day.day}</div>
                     <div>
                       <div className="font-bold text-lg">{day.theme}</div>
                       {day.tips && <div className="text-xs text-white/40 mt-0.5">💡 {day.tips}</div>}
@@ -385,12 +420,12 @@ export default function Home() {
             ))}
 
             {itinerary.practical_tips?.length > 0 && (
-              <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.05] p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2"><span className="text-indigo-400">✦</span> Practical Tips</h3>
+              <div className="rounded-2xl border border-amber-700/20 bg-amber-950/20 p-6">
+                <h3 className="font-semibold mb-4 flex items-center gap-2"><span className="text-amber-500</span> Practical Tips</h3>
                 <ul className="space-y-2">
                   {itinerary.practical_tips.map((tip, i) => (
                     <li key={i} className="text-sm text-white/70 flex items-start gap-2">
-                      <span className="text-indigo-400 mt-0.5 flex-shrink-0">•</span>{tip}
+                      <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>{tip}
                     </li>
                   ))}
                 </ul>
