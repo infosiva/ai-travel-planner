@@ -4,31 +4,47 @@ import { NextRequest, NextResponse } from 'next/server'
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
-  const { destination, duration, budget, travel_style, interests } = await req.json()
+  const { destination, duration, budget, travel_style, interests, travel_with } = await req.json()
+  const withKids = travel_with === 'Family with Kids'
+
+  const kidsInstructions = withKids ? `
+IMPORTANT - This is a FAMILY WITH KIDS itinerary:
+- Every activity must be kid-friendly and suitable for children
+- Prioritise: theme parks, zoos, aquariums, playgrounds, interactive museums, beaches, nature walks
+- Avoid: nightlife, late evenings, overly long cultural visits without kid appeal
+- Include short rest breaks between activities (kids get tired!)
+- Suggest early morning starts and afternoon naps/pool time
+- For every activity include a "kids_tip" field with a practical tip for parents
+- For every day include a "kids_highlight" field naming the most exciting thing for kids that day
+- Include a "kids_essentials" array at the top level with 6 packing/preparation tips for families
+` : ''
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 3000,
-    system: 'You are an expert travel planner. Return ONLY valid JSON, no markdown, no explanation.',
+    max_tokens: 4000,
+    system: 'You are a friendly, expert travel planner who gives warm, practical advice. Return ONLY valid JSON, no markdown, no explanation.',
     messages: [{
       role: 'user',
       content: `Create a ${duration}-day itinerary for ${destination}.
+Travelling with: ${travel_with}
 Budget: ${budget}, Style: ${travel_style}, Interests: ${interests.join(', ')}.
+${kidsInstructions}
 
 Return exactly this JSON structure:
 {
   "destination": "City, Country",
   "duration": ${duration},
-  "overview": "2-3 sentence overview",
-  "budget_estimate": "daily range e.g. $80-120/day",
+  "overview": "2-3 warm, friendly sentences describing what makes this trip special for ${travel_with}",
+  "budget_estimate": "e.g. $80-120/day per person",
+  ${withKids ? '"kids_essentials": ["tip1", "tip2", "tip3", "tip4", "tip5", "tip6"],' : ''}
   "days": [
     {
       "day": 1,
-      "theme": "theme name",
-      "morning": {"activity": "...", "location": "...", "duration": "2-3 hours", "cost": "~$X"},
-      "afternoon": {"activity": "...", "location": "...", "duration": "3-4 hours", "cost": "~$X"},
-      "evening": {"activity": "...", "location": "...", "duration": "2-3 hours", "cost": "~$X"},
-      "tips": "one practical tip"
+      "theme": "descriptive theme name",
+      "morning": {"activity": "specific activity name", "location": "specific place name", "duration": "X hours", "cost": "~$X"${withKids ? ', "kids_tip": "practical tip for parents"' : ''}},
+      "afternoon": {"activity": "...", "location": "...", "duration": "...", "cost": "..."${withKids ? ', "kids_tip": "..."' : ''}},
+      "evening": {"activity": "...", "location": "...", "duration": "...", "cost": "..."${withKids ? ', "kids_tip": "..."' : ''}},
+      "tips": "one practical tip for the day"${withKids ? ',\n      "kids_highlight": "the most exciting thing for kids today"' : ''}
     }
   ],
   "practical_tips": ["tip1", "tip2", "tip3", "tip4", "tip5"]
