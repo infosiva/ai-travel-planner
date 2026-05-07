@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import ShareCard from '@/components/ShareCard'
 
 function useRateLimit(key: string, limit: number) {
   const getUsage = useCallback(() => {
@@ -475,12 +476,24 @@ export default function Home() {
               </div>
             )}
 
-            {/* Bottom print CTA */}
-            <div className="flex justify-center pt-2">
+            {/* Bottom actions */}
+            <div className="flex flex-wrap justify-center gap-3 pt-2">
               <button onClick={() => printItinerary(itinerary, withKids)}
                 className="px-6 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-sm font-medium text-white/60 hover:text-white transition-all flex items-center gap-2">
                 🖨️ Print or save as PDF
               </button>
+              <ShareCard
+                title={`${itinerary.destination} — ${itinerary.duration} Days`}
+                subtitle={`${itinerary.overview.slice(0, 80)}…`}
+                highlights={[
+                  `Budget: ${itinerary.budget_estimate}`,
+                  ...(itinerary.days ?? []).slice(0, 3).map(d => `Day ${d.day}: ${d.theme}`),
+                ]}
+                accentColor="#d97706"
+                productName="WanderAI"
+                productUrl="wanderai.app"
+                ctaText={`Just built my ${itinerary.destination} trip with AI ✈️\n\n${itinerary.destination} — ${itinerary.duration} Days\n💰 ${itinerary.budget_estimate}\n\n${(itinerary.days ?? []).slice(0, 3).map(d => `Day ${d.day}: ${d.theme}`).join('\n')}\n\nTry it free → wanderai.app`}
+              />
             </div>
           </div>
         )}
