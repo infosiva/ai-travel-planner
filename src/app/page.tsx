@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import ShareCard from '@/components/ShareCard'
 
 function useRateLimit(key: string, limit: number) {
@@ -63,14 +63,14 @@ function useWeather(destination: string, enabled: boolean) {
 
 function WeatherBar({ weather, loading }: { weather: WeatherDay[] | null; loading: boolean }) {
   if (loading) return (
-    <div className="rounded-xl border border-white/8 bg-white/[0.025] px-5 py-3 flex items-center gap-3">
+    <div className="glass-liquid rounded-xl px-5 py-3 flex items-center gap-3">
       <div className="w-4 h-4 border-2 border-amber-600/30 border-t-amber-500 rounded-full animate-spin" />
       <span className="text-xs text-white/40">Fetching weather...</span>
     </div>
   )
   if (!weather || weather.length === 0) return null
   return (
-    <div className="rounded-xl border border-amber-700/20 bg-amber-950/20 px-5 py-4">
+    <div className="glass-liquid rounded-xl px-5 py-4 border border-amber-700/20">
       <div className="text-[10px] text-white/40 uppercase tracking-wider mb-3 flex items-center gap-1.5">
         <span>🌤</span> 3-Day Weather Forecast
       </div>
@@ -146,6 +146,13 @@ function printItinerary(itinerary: Itinerary, withKids: boolean) {
   win.print()
 }
 
+const DESTINATION_CARDS = [
+  { city: 'Paris', emoji: '🗼', gradient: 'from-rose-900/80 via-pink-950/60 to-sky-950/80', accent: 'text-rose-300' },
+  { city: 'Bali', emoji: '🏝️', gradient: 'from-emerald-900/80 via-teal-950/60 to-cyan-950/80', accent: 'text-emerald-300' },
+  { city: 'Tokyo', emoji: '🗾', gradient: 'from-violet-900/80 via-purple-950/60 to-sky-950/80', accent: 'text-violet-300' },
+  { city: 'New York', emoji: '🗽', gradient: 'from-sky-900/80 via-blue-950/60 to-cyan-950/80', accent: 'text-sky-300' },
+]
+
 export default function Home() {
   const { remaining, increment, isLimited } = useRateLimit('wanderai-usage', 2)
   const [destination, setDestination] = useState('')
@@ -158,11 +165,19 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [showWeather, setShowWeather] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
+  const [navScrolled, setNavScrolled] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
 
   const toggleInterest = (i: string) => setInterests(p => p.includes(i) ? p.filter(x => x !== i) : [...p, i])
   const withKids = travelWith === 'Family with Kids'
 
   const { weather, weatherLoading } = useWeather(itinerary?.destination || destination, showWeather)
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   async function generate() {
     if (!destination || isLimited) return
@@ -187,113 +202,114 @@ export default function Home() {
     } finally { setLoading(false) }
   }
 
-  const inputCls = 'w-full bg-black/40 border border-amber-900/40 rounded-lg px-4 py-3 text-sm text-amber-100 placeholder-amber-900/60 focus:outline-none focus:border-amber-600/60 transition-all'
+  const inputCls = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-sky-500/50 transition-all'
 
   return (
-    <main className="min-h-screen relative z-10">
-      {/* Noise overlay */}
-      <div className="noise-overlay" aria-hidden="true" />
-      {/* Ambient orbs */}
-      <div className="liquid-blob liquid-blob-1" style={{ background: 'radial-gradient(circle, rgba(217,119,6,0.15), transparent 70%)' }} aria-hidden="true" />
-      <div className="liquid-blob liquid-blob-2" style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.10), transparent 70%)', animationDelay: '-6s' }} aria-hidden="true" />
-
-      {/* Travel Magazine nav */}
-      <nav className="border-b border-amber-900/20 backdrop-blur-xl sticky top-0 z-50" style={{ background: 'rgba(8,6,4,0.85)' }}>
-        {/* Amber accent line at top */}
-        <div className="h-px bg-gradient-to-r from-transparent via-amber-600/60 to-transparent" />
-        <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">✈️</span>
-            <div className="leading-tight">
-              <span className="font-bold text-xl tracking-tight" style={{ color: '#fef9f0' }}>WanderAI</span>
-              <span className="hidden sm:block text-xs font-normal" style={{ color: 'rgba(217,119,6,0.6)' }}>AI Travel Planner</span>
+    <main className="min-h-screen relative z-10 bg-gray-950">
+      {/* Floating nav */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between transition-all duration-300 ${navScrolled ? 'bg-gray-950/90 backdrop-blur-xl border-b border-white/5' : 'bg-transparent'}`}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-2xl">✈️</span>
+          <span className="font-black text-xl tracking-tight text-white">WanderAI</span>
+        </div>
+        <div className="hidden md:flex items-center gap-6 text-sm text-white/50">
+          <a href="#planner" className="hover:text-white transition-colors">Plan a trip</a>
+          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+        </div>
+        <div className="flex items-center gap-3">
+          {withKids && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-semibold">
+              🧒 Family Mode
             </div>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#how" className="transition-colors" style={{ color: 'rgba(254,243,199,0.5)' }} onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')} onMouseLeave={e => (e.currentTarget.style.color = 'rgba(254,243,199,0.5)')}>How it works</a>
-            <a href="#pricing" className="transition-colors" style={{ color: 'rgba(254,243,199,0.5)' }} onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')} onMouseLeave={e => (e.currentTarget.style.color = 'rgba(254,243,199,0.5)')}>Destinations</a>
-          </div>
-          <div className="flex items-center gap-3">
-            {withKids && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-semibold">
-                🧒 Family Mode
-              </div>
-            )}
-            {itinerary && (
-              <button onClick={() => printItinerary(itinerary, withKids)}
-                className="px-3 py-2 rounded-lg border border-amber-800/40 bg-amber-950/30 hover:bg-amber-950/60 text-xs font-medium text-amber-400 hover:text-amber-300 transition-all flex items-center gap-1.5">
-                🖨️ Print / PDF
-              </button>
-            )}
-            <button className="px-5 py-2 rounded-full font-semibold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: '#080604' }}>
-              Plan My Trip
+          )}
+          {itinerary && (
+            <button onClick={() => printItinerary(itinerary, withKids)}
+              className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-medium text-white/60 hover:text-white transition-all flex items-center gap-1.5">
+              🖨️ Print
             </button>
-          </div>
+          )}
+          <button
+            onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-4 py-2 rounded-full text-sm font-bold text-gray-950 transition-all hover:scale-105"
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+            Plan my trip
+          </button>
         </div>
       </nav>
 
-      {/* Hero — Travel Magazine style */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/30 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 pt-14 pb-10 relative">
-          <div className="flex flex-col md:flex-row items-start gap-8">
-            <div className="flex-1">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border font-semibold text-xs uppercase tracking-widest" style={{ borderColor: 'rgba(217,119,6,0.4)', background: 'rgba(120,53,15,0.25)', color: '#fbbf24' }}>
-                ✈️ AI-Powered Itinerary Builder
-              </div>
-              {/* Headline */}
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4" style={{ color: '#fef9f0', letterSpacing: '-0.02em' }}>
-                Your perfect trip,<br />
-                planned in{' '}
-                <span style={{ background: 'linear-gradient(90deg, #d97706, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>seconds.</span>
-              </h1>
-              {/* Subtext */}
-              <p className="text-base max-w-md leading-relaxed mb-6" style={{ color: 'rgba(251,191,36,0.6)' }}>
-                Tell us where you&apos;re going. Our AI builds a day-by-day itinerary with activities, restaurants, and local tips.
-              </p>
-              {/* Trust pills */}
-              <div className="flex flex-wrap gap-2 mb-5">
-                {['☁️ Weather-aware', '🧒 Family-friendly', '🖨️ Print-ready'].map(pill => (
-                  <span key={pill} className="text-xs px-3 py-1.5 rounded-full font-medium" style={{ border: '1px solid rgba(217,119,6,0.35)', color: 'rgba(251,191,36,0.75)', background: 'rgba(120,53,15,0.18)' }}>
-                    {pill}
-                  </span>
-                ))}
-              </div>
-              {/* Destination stamps */}
-              <div className="flex flex-wrap gap-2">
-                {['🗼 Paris', '🗾 Tokyo', '🏝️ Bali', '🗽 New York', '🦁 Safari', '🏔️ Alps'].map(d => (
-                  <button key={d} onClick={() => setDestination(d.split(' ').slice(1).join(' '))}
-                    className="stamp text-xs text-amber-600/80 px-3 py-1.5 rounded-lg hover:border-amber-600/60 hover:text-amber-400 transition-all bg-amber-950/20">
-                    {d}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {/* Stats sidebar */}
-            <div className="hidden lg:flex flex-col gap-3 flex-shrink-0 w-44">
-              {[
-                { icon: '🌍', label: 'Destinations', value: '195+' },
-                { icon: '📅', label: 'Max days', value: '14 days' },
-                { icon: '🧒', label: 'Family mode', value: 'Built-in' },
-                { icon: '🌤', label: 'Weather', value: 'Live' },
-              ].map(s => (
-                <div key={s.label} className="day-card rounded-lg px-3 py-2.5 flex items-center gap-2.5">
-                  <span className="text-lg">{s.icon}</span>
-                  <div>
-                    <div className="text-[9px] text-amber-900 uppercase tracking-widest">{s.label}</div>
-                    <div className="text-sm text-amber-300 font-bold">{s.value}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Full-bleed hero */}
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-sky-950 via-cyan-950 to-amber-950">
+        <div className="noise-overlay" aria-hidden="true" />
+        <div className="liquid-blob liquid-blob-1" style={{ background: 'radial-gradient(circle, rgba(2,132,199,0.25), transparent 70%)' }} aria-hidden="true" />
+        <div className="liquid-blob liquid-blob-2" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.20), transparent 70%)', animationDelay: '-6s' }} aria-hidden="true" />
+        <div className="liquid-blob liquid-blob-3" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.15), transparent 70%)', animationDelay: '-12s' }} aria-hidden="true" />
+        <div className="depth-grid absolute bottom-0 left-0 right-0 h-48 pointer-events-none" aria-hidden="true" />
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+          <div className="pill-glass mb-6 px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-300">
+            ✈️ AI-Powered Travel Planning
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 text-white" style={{ letterSpacing: '-0.03em' }}>
+            Your dream trip,<br />
+            <span className="text-iridescent">planned in 60s</span>
+          </h1>
+          <p className="text-lg text-white/60 max-w-xl mb-10 leading-relaxed">
+            Tell AI where you want to go. Get a full itinerary with hotels, restaurants, and hidden gems.
+          </p>
+
+          {/* Hero search bar */}
+          <div className="glass-liquid rounded-2xl p-2 flex gap-2 max-w-2xl w-full mx-auto">
+            <input
+              value={destination}
+              onChange={e => setDestination(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (generate(), formRef.current?.scrollIntoView({ behavior: 'smooth' }))}
+              placeholder="Where do you want to go? Paris, Bali, Tokyo…"
+              className="flex-1 bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none"
+            />
+            <button
+              onClick={() => { generate(); formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}
+              disabled={!destination}
+              className="px-6 py-3 rounded-xl text-sm font-bold text-gray-950 disabled:opacity-40 transition-all hover:scale-105 flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+              Plan my trip
+            </button>
+          </div>
+
+          {/* Down arrow */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/30">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-24">
-        {/* Config form */}
-        <div className="day-card rounded-xl p-8 mb-8 amber-glow" style={{ boxShadow: withKids ? '0 0 40px rgba(249,115,22,0.12)' : '0 0 40px rgba(217,119,6,0.12)' }}>
+      {/* Destination inspiration cards */}
+      <div className="px-6 py-12 max-w-6xl mx-auto">
+        <div className="text-xs text-white/30 uppercase tracking-widest mb-5 text-center font-semibold">Popular destinations</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {DESTINATION_CARDS.map(card => (
+            <button
+              key={card.city}
+              onClick={() => setDestination(card.city)}
+              className="glass-liquid rounded-2xl overflow-hidden aspect-[3/4] relative group cursor-pointer transition-transform hover:scale-[1.02]">
+              <div className={`absolute inset-0 bg-gradient-to-b ${card.gradient}`} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-5xl mb-3">{card.emoji}</span>
+                <div className={`font-black text-lg ${card.accent}`}>{card.city}</div>
+                <div className="mt-1 px-2.5 py-0.5 rounded-full bg-white/10 text-white/60 text-[10px] font-semibold uppercase tracking-wider">Popular</div>
+              </div>
+              <div className="absolute bottom-0 inset-x-0 py-3 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 backdrop-blur-sm">
+                <span className="text-xs text-white font-semibold">View plans →</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main planner form */}
+      <div ref={formRef} id="planner" className="max-w-2xl mx-auto px-6 pb-12">
+        <div className="glass-liquid rounded-2xl p-8" style={{ boxShadow: withKids ? '0 0 60px rgba(249,115,22,0.10)' : '0 0 60px rgba(2,132,199,0.10)' }}>
+          <h2 className="text-xl font-black text-white mb-6 tracking-tight">Customize your trip</h2>
+
           {/* Row 1: Destination + Duration */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
             <div className="md:col-span-2">
@@ -316,7 +332,7 @@ export default function Home() {
               {TRAVEL_WITH.map(tw => (
                 <button key={tw} onClick={() => setTravelWith(tw)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${travelWith === tw
-                    ? tw === 'Family with Kids' ? 'bg-orange-500/25 border border-orange-500/50 text-orange-300' : 'bg-amber-600/15 border border-amber-600/40 text-amber-300'
+                    ? tw === 'Family with Kids' ? 'bg-orange-500/25 border border-orange-500/50 text-orange-300' : 'bg-sky-600/15 border border-sky-600/40 text-sky-300'
                     : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>
                   {tw === 'Family with Kids' ? '🧒 ' : tw === 'Couple' ? '💑 ' : tw === 'Solo' ? '🎒 ' : tw === 'Friends Group' ? '👥 ' : '👴 '}{tw}
                 </button>
@@ -343,7 +359,7 @@ export default function Home() {
               <label className="text-xs text-white/40 uppercase tracking-wider mb-2 block">Travel style</label>
               <div className="flex gap-1.5">
                 {STYLES.map(s => (
-                  <button key={s} onClick={() => setStyle(s)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${style === s ? 'bg-amber-600/15 border border-amber-600/40 text-amber-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{s}</button>
+                  <button key={s} onClick={() => setStyle(s)} className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${style === s ? 'bg-cyan-600/15 border border-cyan-600/40 text-cyan-300' : 'bg-white/[0.04] border border-white/10 text-white/40 hover:text-white/70'}`}>{s}</button>
                 ))}
               </div>
             </div>
@@ -366,18 +382,20 @@ export default function Home() {
             </div>
           ) : (
             <button onClick={generate} disabled={!destination || loading}
-              className={`w-full py-4 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 ${withKids ? 'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500' : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500'}`}>
+              className={`w-full py-4 rounded-xl font-bold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 text-gray-950 ${withKids ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400' : 'bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400'}`}>
               {loading
-                ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Crafting your itinerary...</>
-                : withKids ? `🧒 Generate family itinerary ✦ (${remaining} left today)` : `Generate itinerary ✦ (${remaining} left today)`
+                ? <><div className="w-4 h-4 border-2 border-gray-950/30 border-t-gray-950 rounded-full animate-spin" /> Crafting your itinerary...</>
+                : withKids ? `🧒 Generate family itinerary ✦ (${remaining} left today)` : `✈️ Generate itinerary ✦ (${remaining} left today)`
               }
             </button>
           )}
         </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto px-6 pb-24">
         {/* Error state */}
         {apiError && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
+          <div className="glass-liquid rounded-2xl border border-red-500/30 p-6 text-center mb-8">
             <div className="text-2xl mb-3">⚠️</div>
             <p className="text-red-300 font-semibold mb-2">Could not generate itinerary</p>
             <p className="text-red-300/70 text-sm max-w-lg mx-auto">{apiError}</p>
@@ -394,19 +412,19 @@ export default function Home() {
           </div>
         )}
 
-        {/* Result */}
+        {/* Generated itinerary results */}
         {itinerary && (
           <div className="space-y-5">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div>
                 <div className="flex items-center gap-3 mb-1 flex-wrap">
-                  <h2 className="text-3xl font-bold">{itinerary.destination} — {itinerary.duration} Days</h2>
+                  <h2 className="text-3xl font-black text-white">{itinerary.destination} — {itinerary.duration} Days</h2>
                   {withKids && <span className="px-2.5 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-300 text-xs font-semibold">🧒 Family Itinerary</span>}
                 </div>
                 <p className="text-white/50 mt-1 max-w-2xl">{itinerary.overview}</p>
               </div>
               <div className="flex gap-2 items-start flex-shrink-0">
-                <div className="px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm">
+                <div className="glass-liquid px-4 py-2 rounded-xl text-sm">
                   <span className="text-white/40">Est. budget: </span>
                   <span className="text-amber-400 font-semibold">{itinerary.budget_estimate}</span>
                 </div>
@@ -418,7 +436,7 @@ export default function Home() {
 
             {/* Kids essentials */}
             {withKids && itinerary.kids_essentials && itinerary.kids_essentials.length > 0 && (
-              <div className="rounded-2xl border border-orange-500/25 bg-orange-500/[0.06] p-5">
+              <div className="glass-liquid rounded-2xl border border-orange-500/25 p-5">
                 <h3 className="font-semibold mb-3 flex items-center gap-2 text-orange-300">🎒 Family Essentials</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {itinerary.kids_essentials.map((tip, i) => (
@@ -431,12 +449,12 @@ export default function Home() {
             )}
 
             {itinerary.days?.map(day => (
-              <div key={day.day} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+              <div key={day.day} className="glass-liquid reveal-3d rounded-2xl p-6">
                 <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-700/20 text-amber-400 flex items-center justify-center font-black flex-shrink-0">{day.day}</div>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black flex-shrink-0 text-white" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)' }}>{day.day}</div>
                     <div>
-                      <div className="font-bold text-lg">{day.theme}</div>
+                      <div className="font-bold text-lg text-white">{day.theme}</div>
                       {day.tips && <div className="text-xs text-white/40 mt-0.5">💡 {day.tips}</div>}
                     </div>
                   </div>
@@ -451,9 +469,9 @@ export default function Home() {
                     const act = day[period]
                     if (!act) return null
                     return (
-                      <div key={period} className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+                      <div key={period} className="rounded-xl bg-white/[0.04] border border-white/5 p-4">
                         <div className="text-xs text-white/30 uppercase tracking-wider mb-2">{period === 'morning' ? '🌅' : period === 'afternoon' ? '☀️' : '🌙'} {period}</div>
-                        <div className="font-semibold text-sm mb-1">{act.activity}</div>
+                        <div className="font-semibold text-sm mb-1 text-white">{act.activity}</div>
                         <div className="text-xs text-white/40">{act.location}</div>
                         <div className="text-xs text-white/30 mt-1">{act.duration}</div>
                         {act.cost && <div className="text-xs text-cyan-400 mt-1">{act.cost}</div>}
@@ -470,8 +488,8 @@ export default function Home() {
             ))}
 
             {itinerary.practical_tips?.length > 0 && (
-              <div className="rounded-2xl border border-amber-700/20 bg-amber-950/20 p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2"><span className="text-amber-500</span> Practical Tips</h3>
+              <div className="glass-liquid rounded-2xl border border-amber-700/20 p-6">
+                <h3 className="font-semibold mb-4 flex items-center gap-2 text-amber-300">✦ Practical Tips</h3>
                 <ul className="space-y-2">
                   {itinerary.practical_tips.map((tip, i) => (
                     <li key={i} className="text-sm text-white/70 flex items-start gap-2">
@@ -506,30 +524,31 @@ export default function Home() {
       </div>
 
       {/* Pricing section */}
-      <section id="pricing" className="border-t border-amber-900/20 px-6 py-20">
+      <section id="pricing" className="border-t border-white/5 px-6 py-20">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-4 border border-amber-700/40 bg-amber-950/20 text-amber-600 text-xs font-bold uppercase tracking-widest rounded">✦ Pricing</div>
-            <h2 className="text-4xl font-black text-amber-100 mb-2" style={{ fontFamily: 'Georgia, serif' }}>Start planning free</h2>
-            <p className="text-amber-900/80 text-sm">2 free itineraries per day · No card required</p>
+            <h2 className="text-4xl font-black text-white mb-2">Start planning free</h2>
+            <p className="text-white/30 text-sm">2 free itineraries per day · No card required</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px border border-amber-900/30 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px border border-white/5 rounded-2xl overflow-hidden">
             {[
               { name: 'Free', price: '$0', sub: 'forever', features: ['2 itineraries / day', 'Up to 14 days', 'Weather forecast', 'Kids family mode', 'Print to PDF', 'All destinations'], cta: 'Start free', highlight: false },
               { name: 'Pro', price: '$6', sub: '/month', features: ['Unlimited itineraries', 'Save & edit trips', 'Hotel & flight links', 'Offline PDF export', 'Custom trip notes', 'Priority AI speed'], cta: 'Go Pro →', highlight: true },
             ].map(plan => (
-              <div key={plan.name} className={`p-8 ${plan.highlight ? 'bg-amber-950/30' : 'bg-black/40'}`}>
-                <div className={`text-xs font-bold uppercase tracking-widest mb-1 ${plan.highlight ? 'text-amber-500' : 'text-amber-900'}`}>{plan.name}</div>
-                <div className={`text-5xl font-black mb-0.5 ${plan.highlight ? 'text-amber-300' : 'text-amber-900'}`} style={{ fontFamily: 'Georgia, serif' }}>{plan.price}</div>
-                <div className={`text-sm mb-6 ${plan.highlight ? 'text-amber-700' : 'text-amber-900/50'}`}>{plan.sub}</div>
+              <div key={plan.name} className={`p-8 ${plan.highlight ? 'bg-sky-950/40' : 'bg-white/[0.02]'}`}>
+                <div className={`text-xs font-bold uppercase tracking-widest mb-1 ${plan.highlight ? 'text-cyan-400' : 'text-white/30'}`}>{plan.name}</div>
+                <div className={`text-5xl font-black mb-0.5 ${plan.highlight ? 'text-white' : 'text-white/30'}`}>{plan.price}</div>
+                <div className={`text-sm mb-6 ${plan.highlight ? 'text-white/40' : 'text-white/20'}`}>{plan.sub}</div>
                 <ul className="space-y-2.5 mb-8">
                   {plan.features.map(f => (
-                    <li key={f} className={`flex items-start gap-2 text-sm ${plan.highlight ? 'text-amber-200/70' : 'text-amber-900/60'}`}>
-                      <span className={plan.highlight ? 'text-amber-500 mt-0.5' : 'text-amber-900/40 mt-0.5'}>•</span> {f}
+                    <li key={f} className={`flex items-start gap-2 text-sm ${plan.highlight ? 'text-white/70' : 'text-white/30'}`}>
+                      <span className={plan.highlight ? 'text-cyan-400 mt-0.5' : 'text-white/20 mt-0.5'}>•</span> {f}
                     </li>
                   ))}
                 </ul>
-                <button className={`w-full py-3 font-bold text-sm transition-all rounded-xl ${plan.highlight ? 'bg-amber-600 hover:bg-amber-500 text-black' : 'border border-amber-900/30 text-amber-900/50 cursor-default'}`}>
+                <button className={`w-full py-3 font-bold text-sm transition-all rounded-xl ${plan.highlight ? 'text-gray-950 hover:scale-[1.02]' : 'border border-white/10 text-white/30 cursor-default'}`}
+                  style={plan.highlight ? { background: 'linear-gradient(135deg, #0284c7, #06b6d4)' } : {}}>
                   {plan.cta}
                 </button>
               </div>
