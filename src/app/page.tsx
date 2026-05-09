@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import ShareCard from '@/components/ShareCard'
 import { useGate } from '@/lib/shared/useGate'
 import RegisterGate from '@/lib/shared/RegisterGate'
+import { Spotlight } from '@/components/aceternity/spotlight'
+import { CardContainer, CardBody, CardItem } from '@/components/aceternity/card-3d'
 
 const INTERESTS = ['Food & Dining', 'Culture & History', 'Nature & Hiking', 'Art & Museums', 'Nightlife', 'Shopping', 'Adventure Sports', 'Photography']
 const BUDGETS = ['Budget', 'Moderate', 'Luxury']
@@ -260,6 +262,7 @@ export default function Home() {
 
       {/* ── HERO — Travel Magazine ─────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+        <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#06b6d4" />
 
         {/* Animated warm ocean-to-coral gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0c2340] via-[#0c4a6e] to-[#1a1a2e]" />
@@ -361,28 +364,38 @@ export default function Home() {
         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-400/60 text-center mb-6">Popular destinations</div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
           {DESTINATION_CARDS.map(card => (
-            <button
-              key={card.city}
-              onClick={() => setDestination(card.city)}
-              className={`group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[2/3] bg-gradient-to-br ${card.gradient} transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]`}
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-              {/* Texture overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              {/* Glow on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: 'radial-gradient(circle at 50% 80%, rgba(249,115,22,0.25) 0%, transparent 70%)' }} />
-              <div className="relative z-10 flex flex-col items-center justify-end h-full pb-5 gap-1.5">
-                <span className="text-4xl md:text-5xl drop-shadow-lg mb-1 group-hover:scale-110 transition-transform duration-300">{card.emoji}</span>
-                <div className="font-black text-base md:text-lg text-white tracking-tight" style={{ fontFamily: "'Georgia', serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{card.city}</div>
-                <div className="px-2.5 py-0.5 rounded-full text-white/70 text-[10px] font-semibold uppercase tracking-wider"
-                  style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)' }}>{card.tag}</div>
-              </div>
-              {/* Hover CTA */}
-              <div className="absolute inset-x-0 bottom-0 py-2 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
-                style={{ background: 'linear-gradient(to top, rgba(249,115,22,0.6), transparent)' }}>
-                <span className="text-[11px] text-orange-200 font-bold">Plan this trip →</span>
-              </div>
-            </button>
+            <CardContainer key={card.city} containerClassName="w-full">
+              <CardBody className="w-full">
+                <CardItem translateZ={40} className="w-full">
+                  <button
+                    onClick={() => setDestination(card.city)}
+                    className={`group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[2/3] bg-gradient-to-br ${card.gradient} transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full`}
+                    style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {/* Texture overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    {/* Glow on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ background: 'radial-gradient(circle at 50% 80%, rgba(249,115,22,0.25) 0%, transparent 70%)' }} />
+                    <div className="relative z-10 flex flex-col items-center justify-end h-full pb-5 gap-1.5">
+                      <CardItem translateZ={60} className="text-4xl md:text-5xl drop-shadow-lg mb-1 group-hover:scale-110 transition-transform duration-300">
+                        {card.emoji}
+                      </CardItem>
+                      <CardItem translateZ={50} className="font-black text-base md:text-lg text-white tracking-tight" style={{ fontFamily: "'Georgia', serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                        {card.city}
+                      </CardItem>
+                      <CardItem translateZ={40} className="px-2.5 py-0.5 rounded-full text-white/70 text-[10px] font-semibold uppercase tracking-wider" style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                        {card.tag}
+                      </CardItem>
+                    </div>
+                    {/* Hover CTA */}
+                    <div className="absolute inset-x-0 bottom-0 py-2 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
+                      style={{ background: 'linear-gradient(to top, rgba(249,115,22,0.6), transparent)' }}>
+                      <span className="text-[11px] text-orange-200 font-bold">Plan this trip →</span>
+                    </div>
+                  </button>
+                </CardItem>
+              </CardBody>
+            </CardContainer>
           ))}
         </div>
       </section>
