@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────
@@ -826,3 +830,28 @@ body {
 /* Aceternity UI */
 @keyframes spotlight { 0%{opacity:0;transform:translate(-72%,-62%) scale(0.5)} 100%{opacity:1;transform:translate(-50%,-40%) scale(1)} }
 .animate-spotlight { animation: spotlight 2s ease 0.75s 1 forwards; }
+
+/* ── Mobile viewport overflow fix ── */
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+img, video, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+pre {
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+* { -webkit-tap-highlight-color: transparent; }
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden !important; }
+}
