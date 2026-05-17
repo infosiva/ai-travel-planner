@@ -913,7 +913,98 @@ export default function Home() {
       </section>
 
       <GuidedTour steps={TRAVEL_TOUR} storageKey="roamplan_tour_v1" accentColor="#0ea5e9" />
+
+      {/* Competitor comparison */}
+      <section style={{ borderTop:'1px solid rgba(14,165,233,0.15)', padding:'48px 24px' }}>
+        <div style={{ maxWidth:800, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:32 }}>
+            <p style={{ fontSize:10, color:'rgba(14,165,233,0.5)', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:8 }}>How we compare</p>
+            <h2 style={{ fontSize:20, fontWeight:800, color:'#f0f9ff' }}>RoamPlan vs alternatives</h2>
+          </div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+              <thead>
+                <tr style={{ borderBottom:'1px solid rgba(14,165,233,0.2)' }}>
+                  {['Feature','RoamPlan','TripAdvisor','Google Trips','Airbnb'].map((h,i) => (
+                    <th key={h} style={{ padding:'10px 12px', textAlign:i===0?'left':'center',
+                      color: i===1 ? '#0ea5e9' : 'rgba(255,255,255,0.3)', fontWeight:700, fontSize:11, letterSpacing:'0.05em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['AI itinerary builder','✅ Claude AI','❌','❌','❌'],
+                  ['Budget breakdown','✅ Detailed','⚠️ Estimates','❌','❌'],
+                  ['Accommodation booking','⚠️ Links','✅ Full','❌','✅ Full'],
+                  ['No login required','✅','❌','❌','❌'],
+                  ['Custom day-by-day plan','✅ AI-written','❌','✅ Basic','❌'],
+                  ['Offline access','✅ Export PDF','❌','✅','❌'],
+                  ['Cost','Free / Pro','Free','Free','Free'],
+                ].map(row => (
+                  <tr key={row[0]} style={{ borderBottom:'1px solid rgba(14,165,233,0.07)' }}>
+                    {row.map((cell,i) => (
+                      <td key={i} style={{ padding:'9px 12px', textAlign:i===0?'left':'center',
+                        color: i===1 ? '#0ea5e9' : i===0 ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.25)',
+                        background: i===1 ? 'rgba(14,165,233,0.04)' : 'transparent', fontSize:11 }}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ borderTop:'1px solid rgba(14,165,233,0.12)', padding:'24px', background:'rgba(2,8,23,0.9)' }}>
+        <div style={{ maxWidth:900, margin:'0 auto', display:'flex', flexWrap:'wrap', justifyContent:'space-between', alignItems:'center', gap:16 }}>
+          <div>
+            <span style={{ fontWeight:900, fontSize:15, color:'#0ea5e9' }}>RoamPlan</span>
+            <p style={{ fontSize:11, color:'rgba(255,255,255,0.25)', marginTop:4 }}>AI travel planner — build your perfect trip in minutes.</p>
+          </div>
+          <div style={{ display:'flex', gap:20, flexWrap:'wrap' }}>
+            {[['About','/about'],['Privacy','/privacy'],['Terms','/terms'],['Cookie Policy','/cookies']].map(([label,href]) => (
+              <a key={label} href={href} style={{ fontSize:11, color:'rgba(255,255,255,0.25)', textDecoration:'none' }}
+                onMouseOver={e=>(e.currentTarget.style.color='#0ea5e9')} onMouseOut={e=>(e.currentTarget.style.color='rgba(255,255,255,0.25)')}>{label}</a>
+            ))}
+          </div>
+          <p style={{ fontSize:10, color:'rgba(255,255,255,0.15)' }}>© 2026 RoamPlan</p>
+        </div>
+      </footer>
     </main>
+    <RoamPlanCookieBanner />
     </>
+  )
+}
+
+function RoamPlanCookieBanner() {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    if (!localStorage.getItem('rp_cookies_ok')) setVisible(true)
+  }, [])
+  if (!visible) return null
+  return (
+    <div style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:200, padding:'12px 24px',
+      background:'rgba(2,8,23,0.97)', borderTop:'1px solid rgba(14,165,233,0.2)',
+      backdropFilter:'blur(16px)', display:'flex', alignItems:'center', justifyContent:'space-between',
+      gap:16, flexWrap:'wrap' }}>
+      <p style={{ fontSize:12, color:'rgba(255,255,255,0.45)', maxWidth:600, lineHeight:1.5 }}>
+        RoamPlan uses essential cookies to save your trip plans and preferences. No tracking, no ads.{' '}
+        <a href="/privacy" style={{ color:'#0ea5e9', textDecoration:'underline', cursor:'pointer' }}>Privacy policy</a>
+      </p>
+      <div style={{ display:'flex', gap:10 }}>
+        <button onClick={() => { localStorage.setItem('rp_cookies_ok','1'); setVisible(false) }}
+          style={{ fontSize:12, fontWeight:700, padding:'7px 20px', borderRadius:8,
+            background:'linear-gradient(135deg,#0ea5e9,#0284c7)', color:'#fff', border:'none', cursor:'pointer' }}>
+          Accept
+        </button>
+        <button onClick={() => setVisible(false)}
+          style={{ fontSize:12, fontWeight:500, padding:'7px 14px', borderRadius:8,
+            background:'transparent', color:'rgba(255,255,255,0.3)',
+            border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer' }}>
+          Decline
+        </button>
+      </div>
+    </div>
   )
 }
