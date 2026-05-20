@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useGate } from '@/lib/shared/useGate'
 import RegisterGate from '@/lib/shared/RegisterGate'
@@ -51,12 +51,14 @@ const STEPS = [
 
 // --- Destination cards ---
 const DESTINATIONS = [
-  { name: 'Tokyo', emoji: '🗼', tags: 'Culture · Food · Tech' },
-  { name: 'Bali', emoji: '🌴', tags: 'Beach · Wellness · Budget' },
-  { name: 'Paris', emoji: '🗼', tags: 'Romance · Art · History' },
-  { name: 'New York', emoji: '🗽', tags: 'City · Food · Shopping' },
-  { name: 'Santorini', emoji: '🏛️', tags: 'Island · Luxury · Views' },
-  { name: 'Safari Kenya', emoji: '🦁', tags: 'Wildlife · Adventure · Nature' },
+  { name: 'Tokyo', emoji: '🗼', tags: 'Culture · Street food · Neon nights' },
+  { name: 'Bali', emoji: '🌴', tags: 'Sunrise yoga · Rice terraces · Budget' },
+  { name: 'Paris', emoji: '🥐', tags: 'Michelin dining · Art · Romance' },
+  { name: 'Amalfi Coast', emoji: '⛵', tags: 'Cliffside villages · Limoncello · Views' },
+  { name: 'Kyoto', emoji: '⛩️', tags: 'Temples · Matcha · Cherry blossom' },
+  { name: 'Patagonia', emoji: '🏔️', tags: 'Glaciers · Hiking · Off-grid' },
+  { name: 'Marrakech', emoji: '🕌', tags: 'Souks · Riad stays · Spice markets' },
+  { name: 'Safari Kenya', emoji: '🦁', tags: 'Big Five · Sunrise drives · Glamping' },
 ]
 
 // --- Floating chatbot ---
@@ -122,8 +124,10 @@ function FloatingChat() {
 
 // --- Main page ---
 export default function Home() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const [destination, setDestination] = useState('')
-  const { count: gateCount, showGate, increment: gateIncrement, onRegistered, dismissGate } = useGate('roamplan', 2, 'plan')
+  const { count: gateCount, showGate, increment: gateIncrement, onRegistered, dismissGate } = useGate('roamplan', 3, 'plan')
 
   // ping stats on mount
   if (typeof window !== 'undefined') pingStats('/')
@@ -141,7 +145,7 @@ export default function Home() {
       {showGate && (
         <RegisterGate
           freeUsed={gateCount}
-          freeLimit={2}
+          freeLimit={3}
           freeFeature="free trip plans"
           lockedFeature="unlimited itineraries + PDF export"
           accentColor="#0ea5e9"
@@ -166,7 +170,7 @@ export default function Home() {
 
       {/* Hero */}
       <motion.section
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="relative z-10 max-w-6xl mx-auto px-6 py-16"
@@ -200,16 +204,16 @@ export default function Home() {
               </button>
             </form>
             <div className="flex flex-wrap gap-4 text-xs text-white/50 mb-3">
-              <span className="flex items-center gap-1">✈️ <strong className="text-white">50k+</strong> trips planned</span>
+              <span className="flex items-center gap-1">✈️ <strong className="text-white">AI-powered</strong> trip planner</span>
               <span className="text-white/20">·</span>
               <span className="flex items-center gap-1">🌍 <strong className="text-white">190+</strong> countries</span>
               <span className="text-white/20">·</span>
               <span className="flex items-center gap-1">⭐ <strong className="text-white">4.9/5</strong> rating</span>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[10px] text-white/25 uppercase tracking-wider">As seen in</span>
-              {['CNN Travel', 'The Guardian', 'Thrillist', 'WIRED'].map(p => (
-                <span key={p} className="text-[11px] font-semibold text-white/35 border border-white/10 rounded px-2 py-0.5">{p}</span>
+              <span className="text-[10px] text-white/25 uppercase tracking-wider">Travellers say</span>
+              {['⭐ "Saved hours of planning"', '🌍 "Spot-on local tips"', '✈️ "Used it 3 trips in a row"'].map(p => (
+                <span key={p} className="text-[11px] font-medium text-white/40 border border-white/10 rounded px-2 py-0.5">{p}</span>
               ))}
             </div>
           </div>
@@ -255,7 +259,7 @@ export default function Home() {
 
       {/* How it works */}
       <motion.section
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
@@ -271,7 +275,7 @@ export default function Home() {
           {STEPS.map((step, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 16 }}
+              initial={mounted ? { opacity: 0, y: 16 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
               viewport={{ once: true }}
@@ -290,7 +294,7 @@ export default function Home() {
 
       {/* Destination inspiration */}
       <motion.section
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}

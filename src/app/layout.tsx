@@ -31,6 +31,7 @@ export const metadata: Metadata = {
   title: 'RoamPlan — AI Travel Planner & Itinerary Generator',
   description: 'Plan your perfect trip with AI. Custom itineraries, hotel picks, and local tips for 180+ destinations.',
   keywords: ['travel planner', 'AI itinerary', 'trip planner', 'travel itinerary', 'holiday planner', 'AI travel', 'itinerary builder', 'personalised travel', 'AI trip planner'],
+  metadataBase: new URL('https://roamplan.app'),
   openGraph: {
     title: 'RoamPlan — AI Travel Planner & Itinerary Generator',
     description: 'Plan your perfect trip with AI. Custom itineraries, hotel picks, and local tips for 180+ destinations.',
@@ -38,13 +39,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: 'RoamPlan',
     url: 'https://roamplan.app',
-    images: [{ url: 'https://roamplan.app/og-image.png', width: 1200, height: 630, alt: 'RoamPlan — AI Travel Planner' }],
+    images: [{ url: 'https://roamplan.app/og.png', width: 1200, height: 630, alt: 'RoamPlan — AI Travel Planner' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RoamPlan — AI Travel Planner & Itinerary Generator',
     description: 'Plan your perfect trip with AI. Custom itineraries, hotel picks, and local tips for 180+ destinations.',
-    images: ['https://roamplan.app/og-image.png'],
+    images: ['https://roamplan.app/og.png'],
   },
   robots: { index: true, follow: true },
   alternates: { canonical: 'https://roamplan.app' },
