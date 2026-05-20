@@ -10,7 +10,7 @@ export default function AuthButton() {
   const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
-    setUser(getStoredUser());
+    setUser(getStoredUser() as AuthUser | null);
   }, []);
 
   if (user) {
@@ -64,7 +64,7 @@ export default function AuthButton() {
       <MagicAuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
-        onSuccess={(u) => { setUser(u); setShowAuth(false); }}
+        onSuccess={(u) => { setUser(u as AuthUser); setShowAuth(false); }}
         site={SITE_CONFIG.site}
         accentColor={SITE_CONFIG.accentColor}
       />
